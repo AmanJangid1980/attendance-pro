@@ -1,3 +1,4 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
     "react-native/scripts/react_native_pods.rb",
@@ -16,24 +17,18 @@ end
 target 'AttendanceApp' do
   config = use_native_modules!
 
-  # react-native-maps Google provider on iOS
-  rn_maps_path = '../node_modules/react-native-maps'
-  pod 'react-native-google-maps', :path => rn_maps_path
-
   use_react_native!(
     :path => config[:reactNativePath],
+    # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-
-  target 'AttendanceAppTests' do
-    inherit! :complete
-  end
 
   post_install do |installer|
     react_native_post_install(
       installer,
       config[:reactNativePath],
       :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
     )
   end
 end
